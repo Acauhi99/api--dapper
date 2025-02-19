@@ -1,2 +1,35 @@
-[*.cs]
+root = true
 
+############################################################
+# General settings
+############################################################
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+############################################################
+# C# files formatting and style
+############################################################
+[*.cs]
+indent_style = space
+indent_size = 2
+
+# Ordenar os "using" colocando os do System primeiro e separando em grupos
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+# Quebra de linha (novas linhas) antes da abertura de chaves
+csharp_new_line_before_open_brace = all
+
+# Indenta rótulos do switch de forma adequada
+csharp_indent_switch_labels = true
+
+# Preferências de qualificação
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# Fim das diretivas
