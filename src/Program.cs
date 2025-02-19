@@ -1,7 +1,7 @@
-using api__dapper.domain.repositories;
 using api__dapper.domain.services;
 using api__dapper.http.routes;
 using api__dapper.infra;
+using api__dapper.infra.repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +21,8 @@ DatabaseConfig.InitializeDatabase();
 // Middleware
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+  app.UseSwagger();
+  app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
