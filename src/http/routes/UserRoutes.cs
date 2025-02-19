@@ -1,5 +1,6 @@
 using api__dapper.domain.services;
 using api__dapper.dtos;
+using api__dapper.utils.exceptions;
 
 
 namespace api__dapper.http.routes;
@@ -21,14 +22,21 @@ public static class UserRoutes
 
     group.MapPost("/", async (CreateUserDto userDto, IUserService service) =>
     {
-      var id = await service.CreateUserAsync(userDto);
-      return Results.Created($"/api/users/{id}", id);
+      try
+      {
+        var user = await service.CreateUserAsync(userDto);
+        return Results.Created($"/api/users/{user.Id}", user);
+      }
+      catch (EmailAlreadyExistsException ex)
+      {
+        return Results.Conflict(new { message = ex.Message });
+      }
     });
 
     group.MapPut("/{id}", async (string id, UpdateUserDto userDto, IUserService service) =>
     {
-      var result = await service.UpdateUserAsync(id, userDto);
-      return result ? Results.NoContent() : Results.NotFound();
+      var updatedUser = await service.UpdateUserAsync(id, userDto);
+      return updatedUser is null ? Results.NotFound() : Results.Ok(updatedUser);
     });
 
     group.MapDelete("/{id}", async (string id, IUserService service) =>

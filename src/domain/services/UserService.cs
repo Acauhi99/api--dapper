@@ -1,6 +1,7 @@
 using api__dapper.domain.models;
-using api__dapper.domain.repositories;
 using api__dapper.dtos;
+using api__dapper.infra.repositories;
+
 using NanoidDotNet;
 
 namespace api__dapper.domain.services;
@@ -9,8 +10,8 @@ public interface IUserService
 {
   Task<IEnumerable<User>> GetAllUsersAsync();
   Task<User?> GetUserByIdAsync(string id);
-  Task<string> CreateUserAsync(CreateUserDto userDto);
-  Task<bool> UpdateUserAsync(string id, UpdateUserDto userDto);
+  Task<User> CreateUserAsync(CreateUserDto userDto);
+  Task<User?> UpdateUserAsync(string id, UpdateUserDto userDto);
   Task<bool> DeleteUserAsync(string id);
 }
 
@@ -33,7 +34,7 @@ public class UserService : IUserService
     return await _repository.GetByIdAsync(id);
   }
 
-  public async Task<string> CreateUserAsync(CreateUserDto userDto)
+  public async Task<User> CreateUserAsync(CreateUserDto userDto)
   {
     var user = new User
     {
@@ -43,18 +44,21 @@ public class UserService : IUserService
       CreatedAt = DateTime.UtcNow
     };
 
-    return await _repository.CreateAsync(user);
+    await _repository.CreateAsync(user);
+
+    return user;
   }
 
-  public async Task<bool> UpdateUserAsync(string id, UpdateUserDto userDto)
+  public async Task<User?> UpdateUserAsync(string id, UpdateUserDto userDto)
   {
     var existingUser = await _repository.GetByIdAsync(id);
-    if (existingUser is null) return false;
+    if (existingUser is null) return null;
 
     existingUser.Name = userDto.Name;
     existingUser.Email = userDto.Email;
 
-    return await _repository.UpdateAsync(existingUser);
+    var success = await _repository.UpdateAsync(existingUser);
+    return success ? existingUser : null;
   }
 
   public async Task<bool> DeleteUserAsync(string id)
