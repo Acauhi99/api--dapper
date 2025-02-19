@@ -6,7 +6,7 @@ public static class DatabaseConfig
 {
   public static void InitializeDatabase()
   {
-    using var connection = new SqliteConnection("Data Source=src/infra/app.db");
+    using var connection = new SqliteConnection("Data Source=src/infra/db/app.db");
     connection.Open();
 
     var command = connection.CreateCommand();
@@ -14,7 +14,7 @@ public static class DatabaseConfig
             CREATE TABLE IF NOT EXISTS Users (
                 Id TEXT PRIMARY KEY,
                 Name TEXT NOT NULL,
-                Email TEXT NOT NULL,
+                Email TEXT NOT NULL UNIQUE,
                 CreatedAt TEXT NOT NULL
             )";
 
