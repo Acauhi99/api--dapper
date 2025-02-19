@@ -1,0 +1,30 @@
+@api__dapper_HostAddress = http://localhost:5090
+
+### Get all users
+GET {{api__dapper_HostAddress}}/api/users
+Accept: application/json
+
+### Get user by ID
+GET {{api__dapper_HostAddress}}/api/users/{{userId}}
+Accept: application/json
+
+### Create new user
+POST {{api__dapper_HostAddress}}/api/users
+Content-Type: application/json
+
+{
+    "name": "John Doe",
+    "email": "john@example.com"
+}
+
+### Update user
+PUT {{api__dapper_HostAddress}}/api/users/{{userId}}
+Content-Type: application/json
+
+{
+    "name": "John Doe Updated",
+    "email": "john.updated@example.com"
+}
+
+### Delete user
+DELETE {{api__dapper_HostAddress}}/api/users/{{userId}}
