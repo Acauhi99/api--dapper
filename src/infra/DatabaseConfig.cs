@@ -1,12 +1,15 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
 
 namespace api__dapper.infra;
 
 public static class DatabaseConfig
 {
-  public static void InitializeDatabase()
+  public static void InitializeDatabase(IConfiguration configuration)
   {
-    using var connection = new SqliteConnection("Data Source=src/infra/db/app.db");
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+    using var connection = new SqliteConnection(connectionString);
     connection.Open();
 
     var command = connection.CreateCommand();

@@ -2,6 +2,7 @@ using Dapper;
 using Microsoft.Data.Sqlite;
 using api__dapper.domain.models;
 using api__dapper.utils.exceptions;
+using Microsoft.Extensions.Configuration;
 
 namespace api__dapper.infra.repositories;
 
@@ -21,7 +22,8 @@ public class UserRepository : IUserRepository
 
   public UserRepository(IConfiguration configuration)
   {
-    _connectionString = "Data Source=src/infra/db/app.db";
+    _connectionString = configuration.GetConnectionString("DefaultConnection")
+        ?? throw new ArgumentNullException(nameof(configuration), "A connection string 'DefaultConnection' não foi encontrada.");
   }
 
   public async Task<User?> GetByIdAsync(string id)

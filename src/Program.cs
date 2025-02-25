@@ -16,7 +16,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 var app = builder.Build();
 
 // Initialize SQLite database
-DatabaseConfig.InitializeDatabase();
+DatabaseConfig.InitializeDatabase(app.Configuration);
 
 // Middleware
 if (app.Environment.IsDevelopment())
