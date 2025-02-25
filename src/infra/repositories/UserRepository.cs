@@ -10,6 +10,7 @@ public interface IUserRepository
 {
   Task<User?> GetByIdAsync(string id);
   Task<IEnumerable<User>> GetAllAsync();
+  Task<User?> GetByEmailAsync(string email);
   Task<string> CreateAsync(User user);
   Task<bool> UpdateAsync(User user);
   Task<bool> DeleteAsync(string id);
@@ -37,6 +38,13 @@ public class UserRepository : IUserRepository
   {
     using var connection = new SqliteConnection(_connectionString);
     return await connection.QueryAsync<User>("SELECT * FROM Users");
+  }
+
+  public async Task<User?> GetByEmailAsync(string email)
+  {
+    using var connection = new SqliteConnection(_connectionString);
+    return await connection.QueryFirstOrDefaultAsync<User>(
+        "SELECT * FROM Users WHERE Email = @Email", new { Email = email });
   }
 
   public async Task<string> CreateAsync(User user)

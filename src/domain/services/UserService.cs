@@ -18,10 +18,12 @@ public interface IUserService
 public class UserService : IUserService
 {
   private readonly IUserRepository _repository;
+  private readonly IPasswordService _passwordService;
 
-  public UserService(IUserRepository repository)
+  public UserService(IUserRepository repository, IPasswordService passwordService)
   {
     _repository = repository;
+    _passwordService = passwordService;
   }
 
   public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -41,6 +43,7 @@ public class UserService : IUserService
       Id = Nanoid.Generate(size: 12),
       Name = userDto.Name,
       Email = userDto.Email,
+      Password = _passwordService.HashPassword(userDto.Password),
       CreatedAt = DateTime.UtcNow
     };
 
@@ -57,6 +60,11 @@ public class UserService : IUserService
     existingUser.Name = userDto.Name;
     existingUser.Email = userDto.Email;
 
+    if (!string.IsNullOrEmpty(userDto.Password))
+    {
+      existingUser.Password = _passwordService.HashPassword(userDto.Password);
+    }
+
     var success = await _repository.UpdateAsync(existingUser);
     return success ? existingUser : null;
   }
@@ -65,4 +73,5 @@ public class UserService : IUserService
   {
     return await _repository.DeleteAsync(id);
   }
+
 }
