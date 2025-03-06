@@ -1,12 +1,15 @@
 using api__dapper.domain.services;
+using api__dapper.http.middlewares;
 using api__dapper.http.routes;
 using api__dapper.infra;
 using api__dapper.infra.repositories;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,31 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Rate limiting
+builder.Services.AddRateLimiter(options =>
+{
+  options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+  // Global rate limit: 30 requests per 10 seconds per client IP
+  options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+  {
+    var clientIp = context.Connection.RemoteIpAddress?.ToString() ?? context.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? "unknown";
+    return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
+    {
+      PermitLimit = 30,
+      Window = TimeSpan.FromSeconds(10)
+    });
+  });
+
+  // More restrictive limits for auth endpoints
+  options.AddFixedWindowLimiter("auth", options =>
+  {
+    options.PermitLimit = 10;
+    options.Window = TimeSpan.FromMinutes(1);
+    options.QueueLimit = 0;
+  });
+});
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -37,7 +65,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       };
     });
 
-builder.Services.AddAuthorization();
+// Add authorization policies
+builder.Services.AddAuthorizationPolicies();
 
 var app = builder.Build();
 
@@ -51,7 +80,11 @@ if (app.Environment.IsDevelopment())
   app.UseSwaggerUI();
 }
 
-// Middleware
+// Apply rate limiting before handling the request
+app.UseRateLimiter();
+
+// Request sanitization
+app.UseRequestSanitization();
 app.UseHttpsRedirection();
 
 // Authentication & Authorization
@@ -61,6 +94,7 @@ app.UseAuthorization();
 // Routes
 app.MapUserEndpoints();
 app.MapAuthEndpoints();
+app.MapAdminEndpoints();
 
 
 // Application Start
