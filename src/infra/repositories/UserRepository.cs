@@ -45,8 +45,9 @@ public class UserRepository(IConfiguration configuration) : IUserRepository
   public async Task<string> CreateUser(User user)
   {
     using var connection = new SqliteConnection(_connectionString);
-    var sql = @"INSERT INTO Users (Id, Name, Email, Password, CreatedAt)
-                    VALUES (@Id, @Name, @Email, @Password, @CreatedAt)";
+    var sql = @"INSERT INTO Users (Id, Name, Email, Password, Role, CreatedAt)
+                    VALUES (@Id, @Name, @Email, @Password, @Role, @CreatedAt)";
+
     try
     {
       await connection.ExecuteAsync(sql, user);

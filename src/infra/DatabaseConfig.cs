@@ -19,6 +19,7 @@ public static class DatabaseConfig
                 Name TEXT NOT NULL,
                 Email TEXT NOT NULL UNIQUE,
                 Password TEXT NOT NULL,
+                Role TEXT NOT NULL DEFAULT 'User',
                 CreatedAt TEXT NOT NULL
             )";
 

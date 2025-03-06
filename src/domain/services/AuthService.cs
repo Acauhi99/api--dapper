@@ -57,7 +57,8 @@ public class AuthService(
     {
         new(ClaimTypes.NameIdentifier, user.Id),
         new(ClaimTypes.Name, user.Name),
-        new(ClaimTypes.Email, user.Email)
+        new(ClaimTypes.Email, user.Email),
+        new(ClaimTypes.Role, user.Role)
     };
 
     var tokenDescriptor = new SecurityTokenDescriptor

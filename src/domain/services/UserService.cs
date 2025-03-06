@@ -14,6 +14,7 @@ public interface IUserService
   Task<User> CreateUser(CreateUserDto userDto);
   Task<User?> UpdateUser(string id, UpdateUserDto userDto);
   Task<bool> DeleteUser(string id);
+  Task<User> CreateAdminUser(CreateUserDto userDto);
 }
 
 public class UserService(IUserRepository repository, IPasswordService passwordService) : IUserService
@@ -72,6 +73,23 @@ public class UserService(IUserRepository repository, IPasswordService passwordSe
   public async Task<bool> DeleteUser(string id)
   {
     return await _repository.DeleteUser(id);
+  }
+
+  public async Task<User> CreateAdminUser(CreateUserDto userDto)
+  {
+    var user = new User
+    {
+      Id = Nanoid.Generate(size: 12),
+      Name = userDto.Name,
+      Email = userDto.Email,
+      Password = _passwordService.HashPassword(userDto.Password),
+      Role = UserRoles.Admin.ToString(),
+      CreatedAt = DateTime.UtcNow
+    };
+
+    await _repository.CreateUser(user);
+
+    return user;
   }
 
 }
