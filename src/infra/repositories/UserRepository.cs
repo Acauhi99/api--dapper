@@ -8,46 +8,41 @@ namespace api__dapper.infra.repositories;
 
 public interface IUserRepository
 {
-  Task<User?> GetByIdAsync(string id);
-  Task<IEnumerable<User>> GetAllAsync();
-  Task<User?> GetByEmailAsync(string email);
-  Task<string> CreateAsync(User user);
-  Task<bool> UpdateAsync(User user);
-  Task<bool> DeleteAsync(string id);
+  Task<User?> GetUserById(string id);
+  Task<IEnumerable<User>> GetAllUsers();
+  Task<User?> GetUserByEmail(string email);
+  Task<string> CreateUser(User user);
+  Task<bool> UpdateUser(User user);
+  Task<bool> DeleteUser(string id);
 }
 
-public class UserRepository : IUserRepository
+public class UserRepository(IConfiguration configuration) : IUserRepository
 {
-  private readonly string _connectionString;
+  private readonly string _connectionString = configuration.GetConnectionString("DefaultConnection")
+        ?? throw new ArgumentNullException(nameof(configuration), "A connection string 'DefaultConnection' não foi encontrada.");
   private const int UniqueConstraintErrorCode = 19;
 
-  public UserRepository(IConfiguration configuration)
-  {
-    _connectionString = configuration.GetConnectionString("DefaultConnection")
-        ?? throw new ArgumentNullException(nameof(configuration), "A connection string 'DefaultConnection' não foi encontrada.");
-  }
-
-  public async Task<User?> GetByIdAsync(string id)
+  public async Task<User?> GetUserById(string id)
   {
     using var connection = new SqliteConnection(_connectionString);
     return await connection.QueryFirstOrDefaultAsync<User>(
         "SELECT * FROM Users WHERE Id = @Id", new { Id = id });
   }
 
-  public async Task<IEnumerable<User>> GetAllAsync()
+  public async Task<IEnumerable<User>> GetAllUsers()
   {
     using var connection = new SqliteConnection(_connectionString);
     return await connection.QueryAsync<User>("SELECT * FROM Users");
   }
 
-  public async Task<User?> GetByEmailAsync(string email)
+  public async Task<User?> GetUserByEmail(string email)
   {
     using var connection = new SqliteConnection(_connectionString);
     return await connection.QueryFirstOrDefaultAsync<User>(
         "SELECT * FROM Users WHERE Email = @Email", new { Email = email });
   }
 
-  public async Task<string> CreateAsync(User user)
+  public async Task<string> CreateUser(User user)
   {
     using var connection = new SqliteConnection(_connectionString);
     var sql = @"INSERT INTO Users (Id, Name, Email, Password, CreatedAt)
@@ -63,7 +58,7 @@ public class UserRepository : IUserRepository
     }
   }
 
-  public async Task<bool> UpdateAsync(User user)
+  public async Task<bool> UpdateUser(User user)
   {
     using var connection = new SqliteConnection(_connectionString);
     var result = await connection.ExecuteAsync(
@@ -72,7 +67,7 @@ public class UserRepository : IUserRepository
     return result > 0;
   }
 
-  public async Task<bool> DeleteAsync(string id)
+  public async Task<bool> DeleteUser(string id)
   {
     using var connection = new SqliteConnection(_connectionString);
     var result = await connection.ExecuteAsync(

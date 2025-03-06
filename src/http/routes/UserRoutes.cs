@@ -12,11 +12,11 @@ public static class UserRoutes
     var group = app.MapGroup("/api/users");
 
     group.MapGet("/", async (IUserService service) =>
-        Results.Ok(await service.GetAllUsersAsync()));
+        Results.Ok(await service.GetAllUsers()));
 
     group.MapGet("/{id}", async (string id, IUserService service) =>
     {
-      var user = await service.GetUserByIdAsync(id);
+      var user = await service.GetUserById(id);
       return user is null ? Results.NotFound() : Results.Ok(user);
     });
 
@@ -24,7 +24,7 @@ public static class UserRoutes
     {
       try
       {
-        var user = await service.CreateUserAsync(userDto);
+        var user = await service.CreateUser(userDto);
         return Results.Created($"/api/users/{user.Id}", user);
       }
       catch (EmailAlreadyExistsException ex)
@@ -35,13 +35,13 @@ public static class UserRoutes
 
     group.MapPut("/{id}", async (string id, UpdateUserDto userDto, IUserService service) =>
     {
-      var updatedUser = await service.UpdateUserAsync(id, userDto);
+      var updatedUser = await service.UpdateUser(id, userDto);
       return updatedUser is null ? Results.NotFound() : Results.Ok(updatedUser);
     });
 
     group.MapDelete("/{id}", async (string id, IUserService service) =>
     {
-      var result = await service.DeleteUserAsync(id);
+      var result = await service.DeleteUser(id);
       return result ? Results.NoContent() : Results.NotFound();
     });
   }
