@@ -11,10 +11,10 @@ public interface IUserService
   Task<IEnumerable<User>> GetAllUsers();
   Task<User?> GetUserById(string id);
   Task<User?> GetUserByEmail(string email);
-  Task<User> CreateUser(CreateUserDto userDto);
-  Task<User?> UpdateUser(string id, UpdateUserDto userDto);
+  Task<User> CreateUser(CreateUser userDto);
+  Task<User?> UpdateUser(string id, UpdateUser userDto);
   Task<bool> DeleteUser(string id);
-  Task<User> CreateAdminUser(CreateUserDto userDto);
+  Task<User> CreateAdminUser(CreateUser userDto);
 }
 
 public class UserService(IUserRepository repository, IPasswordService passwordService) : IUserService
@@ -37,7 +37,7 @@ public class UserService(IUserRepository repository, IPasswordService passwordSe
     return await _repository.GetUserByEmail(email);
   }
 
-  public async Task<User> CreateUser(CreateUserDto userDto)
+  public async Task<User> CreateUser(CreateUser userDto)
   {
     var user = new User
     {
@@ -53,7 +53,7 @@ public class UserService(IUserRepository repository, IPasswordService passwordSe
     return user;
   }
 
-  public async Task<User?> UpdateUser(string id, UpdateUserDto userDto)
+  public async Task<User?> UpdateUser(string id, UpdateUser userDto)
   {
     var existingUser = await _repository.GetUserById(id);
     if (existingUser is null) return null;
@@ -75,7 +75,7 @@ public class UserService(IUserRepository repository, IPasswordService passwordSe
     return await _repository.DeleteUser(id);
   }
 
-  public async Task<User> CreateAdminUser(CreateUserDto userDto)
+  public async Task<User> CreateAdminUser(CreateUser userDto)
   {
     var user = new User
     {

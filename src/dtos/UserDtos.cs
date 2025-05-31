@@ -1,6 +1,6 @@
 namespace api__dapper.dtos
 {
-  public record CreateUserDto(string Name, string Email, string Password);
-  public record UpdateUserDto(string Name, string Email, string? Password);
-  public record LoginDto(string Email, string Password);
+  public record CreateUser(string Name, string Email, string Password);
+  public record UpdateUser(string Name, string Email, string? Password);
+  public record Login(string Email, string Password);
 }

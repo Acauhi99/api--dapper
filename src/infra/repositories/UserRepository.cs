@@ -2,7 +2,6 @@ using Dapper;
 using Microsoft.Data.Sqlite;
 using api__dapper.domain.models;
 using api__dapper.utils.exceptions;
-using Microsoft.Extensions.Configuration;
 
 namespace api__dapper.infra.repositories;
 

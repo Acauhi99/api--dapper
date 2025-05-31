@@ -10,7 +10,7 @@ public static class AuthRoutes
   {
     var group = app.MapGroup("/api/auth");
 
-    group.MapPost("/login", async (LoginDto loginDto, IAuthService authService) =>
+    group.MapPost("/login", async (Login loginDto, IAuthService authService) =>
     {
       var token = await authService.Login(loginDto);
       if (token == null)
@@ -19,7 +19,7 @@ public static class AuthRoutes
       return Results.Ok(new { token });
     });
 
-    group.MapPost("/register", async (CreateUserDto registerDto, IAuthService authService) =>
+    group.MapPost("/register", async (CreateUser registerDto, IAuthService authService) =>
     {
       try
       {

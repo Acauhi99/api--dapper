@@ -1,0 +1,33 @@
+### Variáveis
+@baseUrl = http://localhost:5090
+@token = {{login.response.body.token}}
+
+### Login
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+### Register new user
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "email": "joao@example.com",
+  "password": "senha123"
+}
+
+### Register - teste com email duplicado
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Maria Santos",
+  "email": "joao@example.com",
+  "password": "senha456"
+}

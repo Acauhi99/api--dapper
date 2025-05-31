@@ -31,7 +31,7 @@ public static class UserRoutes
       return userData is null ? Results.NotFound() : Results.Ok(userData);
     });
 
-    group.MapPost("/", async (CreateUserDto userDto, IUserService service) =>
+    group.MapPost("/", async (CreateUser userDto, IUserService service) =>
     {
       try
       {
@@ -44,7 +44,7 @@ public static class UserRoutes
       }
     });
 
-    group.MapPut("/{id}", [Authorize(Policy = AuthorizationPolicies.UserOrAdmin)] async (string id, UpdateUserDto userDto, IUserService service, ClaimsPrincipal user) =>
+    group.MapPut("/{id}", [Authorize(Policy = AuthorizationPolicies.UserOrAdmin)] async (string id, UpdateUser userDto, IUserService service, ClaimsPrincipal user) =>
     {
       var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
       var role = user.FindFirstValue(ClaimTypes.Role);

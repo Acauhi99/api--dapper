@@ -1,0 +1,36 @@
+### Variáveis
+@baseUrl = http://localhost:5090
+@adminSecret = 66b3a80374ed00091b62ff3c051497aa233d568a0fb96d9977e8493f3c19cd77
+
+### Setup Admin User
+POST {{baseUrl}}/api/admin/setup
+Content-Type: application/json
+
+{
+  "name": "Administrator",
+  "email": "admin@example.com",
+  "password": "admin123",
+  "adminSecret": "{{adminSecret}}"
+}
+
+### Setup Admin - teste com secret incorreto
+POST {{baseUrl}}/api/admin/setup
+Content-Type: application/json
+
+{
+  "name": "Fake Admin",
+  "email": "fake@example.com",
+  "password": "fake123",
+  "adminSecret": "wrong-secret"
+}
+
+### Setup Admin - teste com email duplicado
+POST {{baseUrl}}/api/admin/setup
+Content-Type: application/json
+
+{
+  "name": "Another Admin",
+  "email": "admin@example.com",
+  "password": "admin456",
+  "adminSecret": "{{adminSecret}}"
+}

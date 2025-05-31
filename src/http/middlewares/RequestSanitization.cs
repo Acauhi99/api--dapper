@@ -35,24 +35,41 @@ public class RequestSanitization(RequestDelegate next)
 
   private static bool ContainsMaliciousContent(string content)
   {
+    // Padrões XSS mais específicos
     var xssPatterns = new[]
     {
-      @"<script>", @"javascript:", @"onload=", @"onerror=", @"onclick="
+      @"<script[^>]*>.*?</script>",
+      @"javascript\s*:",
+      @"on\w+\s*=\s*[""'][^""']*[""']",
+      @"<iframe[^>]*>",
+      @"<object[^>]*>",
+      @"<embed[^>]*>"
     };
 
+    // Padrões SQL Injection mais específicos
     var sqlInjectionPatterns = new[]
     {
-      @"--", @";--", @";", @"/*", @"*/", @"@@", @"@@identity",
-      @"exec[(\s)]+(xp_)", @"exec[(\s)]+(@)", @"select.*from", @"insert.*into",
-      @"drop\s+table", @"drop\s+database", @"delete\s+from", @"update\s+.+\s+set"
+      @";\s*drop\s+table",
+      @";\s*drop\s+database",
+      @";\s*delete\s+from",
+      @";\s*insert\s+into",
+      @"union\s+select",
+      @"exec\s*\(\s*xp_",
+      @"exec\s+xp_",
+      @"--\s*$",
+      @"/\*.*?\*/"
     };
 
     var allPatterns = xssPatterns.Concat(sqlInjectionPatterns);
 
     foreach (var pattern in allPatterns)
     {
-      if (Regex.IsMatch(content.ToLower(), pattern, RegexOptions.IgnoreCase))
+      if (Regex.IsMatch(content, pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline))
+      {
+        Console.WriteLine($"Malicious pattern detected: {pattern}");
+        Console.WriteLine($"Content: {content}");
         return true;
+      }
     }
 
     return false;

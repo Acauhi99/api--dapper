@@ -11,8 +11,8 @@ namespace api__dapper.domain.services;
 
 public interface IAuthService
 {
-  Task<string?> Login(LoginDto loginDto);
-  Task<(User User, string Token)> Register(CreateUserDto registerDto);
+  Task<string?> Login(Login loginDto);
+  Task<(User User, string Token)> Register(CreateUser registerDto);
   string GenerateJwtToken(User user);
 }
 
@@ -25,7 +25,7 @@ public class AuthService(
   private readonly IPasswordService _passwordService = passwordService;
   private readonly IConfiguration _configuration = configuration;
 
-  public async Task<string?> Login(LoginDto loginDto)
+  public async Task<string?> Login(Login loginDto)
   {
     var user = await _userService.GetUserByEmail(loginDto.Email);
 
@@ -38,7 +38,7 @@ public class AuthService(
     return GenerateJwtToken(user);
   }
 
-  public async Task<(User User, string Token)> Register(CreateUserDto registerDto)
+  public async Task<(User User, string Token)> Register(CreateUser registerDto)
   {
     var user = await _userService.CreateUser(registerDto);
     var token = GenerateJwtToken(user);

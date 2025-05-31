@@ -23,7 +23,7 @@ public static class AdminRoutes
 
       try
       {
-        var user = await userService.CreateAdminUser(new CreateUserDto(adminDto.Name, adminDto.Email, adminDto.Password));
+        var user = await userService.CreateAdminUser(new CreateUser(adminDto.Name, adminDto.Email, adminDto.Password));
 
         return Results.Created($"/api/users/{user.Id}", new
         {

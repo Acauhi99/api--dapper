@@ -1,5 +1,4 @@
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Configuration;
 
 namespace api__dapper.infra;
 
