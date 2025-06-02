@@ -22,6 +22,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IServiceManagementService, ServiceManagementService>();
 
 // Rate limiting
 builder.Services.AddRateLimiter(options =>
@@ -95,6 +97,7 @@ app.UseAuthorization();
 app.MapUserEndpoints();
 app.MapAuthEndpoints();
 app.MapAdminEndpoints();
+app.MapServiceEndpoints();
 
 
 // Application Start
