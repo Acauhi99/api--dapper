@@ -1,0 +1,62 @@
+### Variáveis
+@baseUrl = http://localhost:5090
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiItYnpfTi1jS05LeXIiLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzQ4NjU2MTg2LCJleHAiOjE3NDg2NTk3ODYsImlhdCI6MTc0ODY1NjE4NiwiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.caGZl3UWrntFrkT2wkrFsl_cuxHwx8PjJ-nCpGzmFhI
+@serviceId = service-id-here
+@serviceKey = service-key-here
+
+### Get All Services (Public)
+GET {{baseUrl}}/api/services
+
+### Get Service by Key (Public)
+GET {{baseUrl}}/api/services/key/{{serviceKey}}
+
+### Create Service (Admin only)
+POST {{baseUrl}}/api/services
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Web Development",
+  "description": "Complete web development service",
+  "price": 999.99,
+  "key": "web-dev"
+}
+
+### Create Service - outro exemplo
+POST {{baseUrl}}/api/services
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Mobile App Development",
+  "description": "Native and cross-platform mobile app development",
+  "price": 1499.99,
+  "key": "mobile-dev"
+}
+
+### Get Service by ID (Admin only)
+GET {{baseUrl}}/api/services/{{serviceId}}
+Authorization: Bearer {{token}}
+
+### Update Service (Admin only)
+PUT {{baseUrl}}/api/services/{{serviceId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Web Development Premium",
+  "description": "Complete web development service with premium features",
+  "price": 1299.99,
+  "key": "web-dev-premium"
+}
+
+### Delete Service (Admin only)
+DELETE {{baseUrl}}/api/services/{{serviceId}}
+Authorization: Bearer {{token}}
+
+### Teste sem autenticação em endpoint admin
+GET {{baseUrl}}/api/services/{{serviceId}}
+
+### Teste com token inválido
+GET {{baseUrl}}/api/services/{{serviceId}}
+Authorization: Bearer invalid-token-here

@@ -16,12 +16,6 @@ public static class ServiceRoutes
     group.MapGet("/", async (IServiceManagementService service) =>
         Results.Ok(await service.GetAllServices()));
 
-    group.MapGet("/{id}", async (string id, IServiceManagementService service) =>
-    {
-      var serviceData = await service.GetServiceById(id);
-      return serviceData is null ? Results.NotFound() : Results.Ok(serviceData);
-    });
-
     group.MapGet("/key/{key}", async (string key, IServiceManagementService service) =>
     {
       var serviceData = await service.GetServiceByKey(key);
@@ -33,6 +27,12 @@ public static class ServiceRoutes
     {
       var createdService = await service.CreateService(serviceDto);
       return Results.Created($"/api/services/{createdService.Id}", createdService);
+    });
+
+    group.MapGet("/{id}", [Authorize(Policy = AuthorizationPolicies.AdminOnly)] async (string id, IServiceManagementService service) =>
+    {
+      var serviceData = await service.GetServiceById(id);
+      return serviceData is null ? Results.NotFound() : Results.Ok(serviceData);
     });
 
     group.MapPut("/{id}", [Authorize(Policy = AuthorizationPolicies.AdminOnly)] async (string id, UpdateService serviceDto, IServiceManagementService service) =>

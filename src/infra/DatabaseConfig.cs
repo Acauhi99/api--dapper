@@ -59,6 +59,20 @@ public static class DatabaseConfig
                 [Order] INTEGER NOT NULL,
                 CreatedAt TEXT NOT NULL,
                 FOREIGN KEY (ServiceId) REFERENCES Services (Id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS Sells (
+                Id TEXT PRIMARY KEY,
+                UserId TEXT NOT NULL,
+                ServiceId TEXT NOT NULL,
+                PackageId TEXT NOT NULL,
+                Amount REAL NOT NULL,
+                Status INTEGER NOT NULL DEFAULT 0,
+                CreatedAt TEXT NOT NULL,
+                CompletedAt TEXT NULL,
+                FOREIGN KEY (UserId) REFERENCES Users (Id) ON DELETE CASCADE,
+                FOREIGN KEY (ServiceId) REFERENCES Services (Id) ON DELETE CASCADE,
+                FOREIGN KEY (PackageId) REFERENCES Packages (Id) ON DELETE CASCADE
             )";
 
     command.ExecuteNonQuery();
