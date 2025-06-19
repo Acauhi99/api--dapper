@@ -1,6 +1,10 @@
 ### Variáveis
 @baseUrl = http://localhost:5090
+<<<<<<< HEAD
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJDSWZDZHlOTmlKVmciLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUwMzU5MTMzLCJleHAiOjE3NTAzNjI3MzMsImlhdCI6MTc1MDM1OTEzMywiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.vTAj99iYZaJ5XmhvwHCcYJq88zDTKjTc649VCDiFngw
+=======
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJQajJGVnZlX0ZkLTIiLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUwMzU2NTI4LCJleHAiOjE3NTAzNjAxMjgsImlhdCI6MTc1MDM1NjUyOCwiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.F0PNb-GGhLahnS2TWeImUMXpQxyqRWncuHIKwEwzzwQ
+>>>>>>> ffb9d9384492b99face3abe1769dd0a6e574aa92
 @serviceId = 3qtXZhB9ubCv
 @serviceKey = web-dev
 

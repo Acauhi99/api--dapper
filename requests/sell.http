@@ -1,9 +1,10 @@
 ### Variáveis
 @baseUrl = http://localhost:5090
-@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiItYnpfTi1jS05LeXIiLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzQ4NjU2MTg2LCJleHAiOjE3NDg2NTk3ODYsImlhdCI6MTc0ODY1NjE4NiwiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.caGZl3UWrntFrkT2wkrFsl_cuxHwx8PjJ-nCpGzmFhI
-@userToken = user-token-here
-@sellId = sell-id-here
-@serviceId = service-id-here
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJDSWZDZHlOTmlKVmciLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUwMzU5MTMzLCJleHAiOjE3NTAzNjI3MzMsImlhdCI6MTc1MDM1OTEzMywiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.vTAj99iYZaJ5XmhvwHCcYJq88zDTKjTc649VCDiFngw
+@userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJDSWZDZHlOTmlKVmciLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUwMzU5MTMzLCJleHAiOjE3NTAzNjI3MzMsImlhdCI6MTc1MDM1OTEzMywiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.vTAj99iYZaJ5XmhvwHCcYJq88zDTKjTc649VCDiFngw
+@sellId = 7iyUP0fY5PvLuGQfYYC15
+@serviceId = mhOH_HKSbqJk
+@packageId = evfEl5hAIOJq
 
 ### Get All Sells (Admin only)
 GET {{baseUrl}}/api/sells
@@ -21,26 +22,37 @@ Authorization: Bearer {{userToken}}
 GET {{baseUrl}}/api/sells/my-purchases
 Authorization: Bearer {{adminToken}}
 
-### Create Sell (User or Admin)
+### Create Sell - Pacote Básico
 POST {{baseUrl}}/api/sells
 Authorization: Bearer {{userToken}}
 Content-Type: application/json
 
 {
   "serviceId": "{{serviceId}}",
-  "quantity": 1,
-  "notes": "Urgent project, need to start ASAP"
+  "packageId": "{{packageId}}",
+  "amount": 2500.00
 }
 
-### Create Sell - outro exemplo
+### Create Sell - Pacote Profissional
 POST {{baseUrl}}/api/sells
 Authorization: Bearer {{userToken}}
 Content-Type: application/json
 
 {
   "serviceId": "{{serviceId}}",
-  "quantity": 2,
-  "notes": "Two mobile apps needed"
+  "packageId": "package-professional-id",
+  "amount": 4500.00
+}
+
+### Create Sell - Pacote Enterprise
+POST {{baseUrl}}/api/sells
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "serviceId": "{{serviceId}}",
+  "packageId": "package-enterprise-id",
+  "amount": 8500.00
 }
 
 ### Create Sell as Admin
@@ -50,17 +62,8 @@ Content-Type: application/json
 
 {
   "serviceId": "{{serviceId}}",
-  "quantity": 1,
-  "notes": "Admin test purchase"
-}
-
-### Update Sell Status (Admin only)
-PUT {{baseUrl}}/api/sells/{{sellId}}/status
-Authorization: Bearer {{adminToken}}
-Content-Type: application/json
-
-{
-  "status": "InProgress"
+  "packageId": "{{packageId}}",
+  "amount": 2500.00
 }
 
 ### Update Sell Status - para Completed
@@ -69,7 +72,7 @@ Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
-  "status": "Completed"
+  "status": 1
 }
 
 ### Update Sell Status - para Cancelled
@@ -78,7 +81,16 @@ Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
-  "status": "Cancelled"
+  "status": 2
+}
+
+### Update Sell Status - para Refunded
+PUT {{baseUrl}}/api/sells/{{sellId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "status": 3
 }
 
 ### Delete Sell (Admin only)
@@ -91,7 +103,3 @@ GET {{baseUrl}}/api/sells
 ### Teste user tentando acessar endpoint admin
 GET {{baseUrl}}/api/sells
 Authorization: Bearer {{userToken}}
-
-### Teste com token inválido
-GET {{baseUrl}}/api/sells/my-purchases
-Authorization: Bearer invalid-token-here

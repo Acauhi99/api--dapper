@@ -40,19 +40,115 @@ public class SellRepository(IConfiguration configuration) : ISellRepository
   public async Task<IEnumerable<SellResponse>> GetAllSells()
   {
     using var connection = new SqliteConnection(_connectionString);
-    return await connection.QueryAsync<SellResponse>("SELECT * FROM Sells");
+
+    var sql = @"
+      SELECT
+        s.Id,
+        s.UserId,
+        s.ServiceId,
+        s.PackageId,
+        s.Amount,
+        s.Status,
+        s.CreatedAt,
+        s.CompletedAt,
+        u.Name as UserName,
+        sv.Title as ServiceTitle
+      FROM Sells s
+      LEFT JOIN Users u ON s.UserId = u.Id
+      LEFT JOIN Services sv ON s.ServiceId = sv.Id
+      ORDER BY s.CreatedAt DESC";
+
+    var results = await connection.QueryAsync<dynamic>(sql);
+
+    return results.Select(r => new SellResponse(
+      r.Id,
+      r.UserId,
+      r.ServiceId,
+      r.PackageId,
+      Convert.ToDecimal(r.Amount),
+      Convert.ToInt32(r.Status),
+      DateTime.Parse(r.CreatedAt),
+      r.CompletedAt != null ? DateTime.Parse(r.CompletedAt) : null,
+      r.UserName,
+      r.ServiceTitle
+    ));
   }
 
   public async Task<SellResponse?> GetSellById(string id)
   {
     using var connection = new SqliteConnection(_connectionString);
-    return await connection.QueryFirstOrDefaultAsync<SellResponse>("SELECT * FROM Sells WHERE Id = @Id", new { Id = id });
+
+    var sql = @"
+      SELECT
+        s.Id,
+        s.UserId,
+        s.ServiceId,
+        s.PackageId,
+        s.Amount,
+        s.Status,
+        s.CreatedAt,
+        s.CompletedAt,
+        u.Name as UserName,
+        sv.Title as ServiceTitle
+      FROM Sells s
+      LEFT JOIN Users u ON s.UserId = u.Id
+      LEFT JOIN Services sv ON s.ServiceId = sv.Id
+      WHERE s.Id = @Id";
+
+    var result = await connection.QueryFirstOrDefaultAsync<dynamic>(sql, new { Id = id });
+
+    if (result == null) return null;
+
+    return new SellResponse(
+      result.Id,
+      result.UserId,
+      result.ServiceId,
+      result.PackageId,
+      Convert.ToDecimal(result.Amount),
+      Convert.ToInt32(result.Status),
+      DateTime.Parse(result.CreatedAt),
+      result.CompletedAt != null ? DateTime.Parse(result.CompletedAt) : null,
+      result.UserName,
+      result.ServiceTitle
+    );
   }
 
   public async Task<IEnumerable<SellResponse>> GetSellsByUserId(string userId)
   {
     using var connection = new SqliteConnection(_connectionString);
-    return await connection.QueryAsync<SellResponse>("SELECT * FROM Sells WHERE UserId = @UserId", new { UserId = userId });
+
+    var sql = @"
+      SELECT
+        s.Id,
+        s.UserId,
+        s.ServiceId,
+        s.PackageId,
+        s.Amount,
+        s.Status,
+        s.CreatedAt,
+        s.CompletedAt,
+        u.Name as UserName,
+        sv.Title as ServiceTitle
+      FROM Sells s
+      LEFT JOIN Users u ON s.UserId = u.Id
+      LEFT JOIN Services sv ON s.ServiceId = sv.Id
+      WHERE s.UserId = @UserId
+      ORDER BY s.CreatedAt DESC";
+
+    var results = await connection.QueryAsync<dynamic>(sql, new { UserId = userId });
+
+    return results.Select(r => new SellResponse(
+      r.Id,
+      r.UserId,
+      r.ServiceId,
+      r.PackageId,
+      Convert.ToDecimal(r.Amount),
+      Convert.ToInt32(r.Status),
+      DateTime.Parse(r.CreatedAt),
+      r.CompletedAt != null ? DateTime.Parse(r.CompletedAt) : null,
+      r.UserName,
+      r.ServiceTitle
+    ));
   }
 
   public async Task<bool> UpdateSellStatus(string id, SellStatus status)
