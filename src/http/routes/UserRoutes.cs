@@ -14,7 +14,7 @@ public static class UserRoutes
 {
   public static void MapUserEndpoints(this WebApplication app)
   {
-    var group = app.MapGroup("/api/users");
+    var group = app.MapGroup("/api/users").WithTags("Users");
 
     group.MapGet("/", [Authorize(Policy = AuthorizationPolicies.AdminOnly)] async (IUserService service) =>
         Results.Ok(await service.GetAllUsers()));

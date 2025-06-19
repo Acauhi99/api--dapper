@@ -13,6 +13,9 @@ public interface ISellRepository
   Task<string> CreateSell(Sell sell);
   Task<bool> UpdateSellStatus(string id, SellStatus status);
   Task<bool> DeleteSell(string id);
+  Task<ClientOrderHistoryResponse> GetClientOrderHistory(string userId, OrderQueryFilter filter);
+  Task<AdminOrdersResponse> GetAdminOrdersList(OrderQueryFilter filter);
+  Task<OrderSummaryResponse> GetOrdersSummary(SummaryQueryFilter filter);
 }
 
 public class SellRepository(IConfiguration configuration) : ISellRepository
@@ -156,5 +159,236 @@ public class SellRepository(IConfiguration configuration) : ISellRepository
     using var connection = new SqliteConnection(_connectionString);
     var result = await connection.ExecuteAsync("UPDATE Sells SET Status = @Status WHERE Id = @Id", new { Id = id, Status = status });
     return result > 0;
+  }
+
+  public async Task<ClientOrderHistoryResponse> GetClientOrderHistory(string userId, OrderQueryFilter filter)
+  {
+    using var connection = new SqliteConnection(_connectionString);
+
+    var whereClause = "WHERE s.UserId = @UserId";
+    var parameters = new DynamicParameters();
+    parameters.Add("UserId", userId);
+
+    // Adicionar filtros opcionais
+    if (filter.StartDate.HasValue)
+    {
+      whereClause += " AND s.CreatedAt >= @StartDate";
+      parameters.Add("StartDate", filter.StartDate.Value.ToString("o"));
+    }
+
+    if (filter.EndDate.HasValue)
+    {
+      whereClause += " AND s.CreatedAt <= @EndDate";
+      parameters.Add("EndDate", filter.EndDate.Value.ToString("o"));
+    }
+
+    if (!string.IsNullOrEmpty(filter.OrderCode))
+    {
+      whereClause += " AND s.Id LIKE @OrderCode";
+      parameters.Add("OrderCode", $"%{filter.OrderCode}%");
+    }
+
+    if (!string.IsNullOrEmpty(filter.ServiceName))
+    {
+      whereClause += " AND srv.Title LIKE @ServiceName";
+      parameters.Add("ServiceName", $"%{filter.ServiceName}%");
+    }
+
+    var query = $@"
+        SELECT
+            s.Id,
+            s.Id as OrderCode,
+            srv.Title as ServiceName,
+            CAST(s.Amount as DECIMAL(10,2)) as Price,
+            s.CreatedAt as Date,
+            CASE
+                WHEN s.Status = 0 THEN 'Pending'
+                WHEN s.Status = 1 THEN 'Completed'
+                WHEN s.Status = 2 THEN 'Cancelled'
+                WHEN s.Status = 3 THEN 'Refunded'
+                ELSE 'Unknown'
+            END as Status
+        FROM Sells s
+        JOIN Services srv ON s.ServiceId = srv.Id
+        {whereClause}
+        ORDER BY s.CreatedAt DESC";
+
+    var ordersRaw = await connection.QueryAsync<dynamic>(query, parameters);
+
+    var ordersList = ordersRaw.Select(r => new OrderHistoryItem(
+        Id: r.Id,
+        OrderCode: r.OrderCode,
+        ServiceName: r.ServiceName,
+        Price: Convert.ToDecimal(r.Price),
+        Date: DateTime.Parse(r.Date),
+        Status: r.Status
+    )).ToList();
+
+    // Calcula totais
+    var totalCountQuery = $@"
+        SELECT COUNT(*), SUM(CAST(s.Amount as DECIMAL(10,2)))
+        FROM Sells s
+        JOIN Services srv ON s.ServiceId = srv.Id
+        {whereClause}";
+
+    var totalResult = await connection.QueryFirstOrDefaultAsync<(int Count, decimal Sum)>(totalCountQuery, parameters);
+
+    return new ClientOrderHistoryResponse(
+        Orders: ordersList,
+        TotalCount: totalResult.Count,
+        TotalAmount: totalResult.Sum
+    );
+  }
+
+  public async Task<AdminOrdersResponse> GetAdminOrdersList(OrderQueryFilter filter)
+  {
+    using var connection = new SqliteConnection(_connectionString);
+
+    var whereClause = "WHERE 1=1";
+    var parameters = new DynamicParameters();
+
+    // Adicionar filtros opcionais
+    if (filter.StartDate.HasValue)
+    {
+      whereClause += " AND s.CreatedAt >= @StartDate";
+      parameters.Add("StartDate", filter.StartDate.Value.ToString("o"));
+    }
+
+    if (filter.EndDate.HasValue)
+    {
+      whereClause += " AND s.CreatedAt <= @EndDate";
+      parameters.Add("EndDate", filter.EndDate.Value.ToString("o"));
+    }
+
+    if (!string.IsNullOrEmpty(filter.OrderCode))
+    {
+      whereClause += " AND s.Id LIKE @OrderCode";
+      parameters.Add("OrderCode", $"%{filter.OrderCode}%");
+    }
+
+    if (!string.IsNullOrEmpty(filter.ClientName))
+    {
+      whereClause += " AND u.Name LIKE @ClientName";
+      parameters.Add("ClientName", $"%{filter.ClientName}%");
+    }
+
+    if (!string.IsNullOrEmpty(filter.ServiceName))
+    {
+      whereClause += " AND srv.Title LIKE @ServiceName";
+      parameters.Add("ServiceName", $"%{filter.ServiceName}%");
+    }
+
+    // Calcula totais para paginação
+    var countQuery = $@"
+        SELECT COUNT(*), SUM(CAST(s.Amount as DECIMAL(10,2)))
+        FROM Sells s
+        JOIN Users u ON s.UserId = u.Id
+        JOIN Services srv ON s.ServiceId = srv.Id
+        {whereClause}";
+
+    var totalResult = await connection.QueryFirstOrDefaultAsync<(int Count, decimal Sum)>(countQuery, parameters);
+
+    // Adiciona paginação
+    var totalPages = (int)Math.Ceiling(totalResult.Count / (double)filter.PageSize);
+    var offset = (filter.Page - 1) * filter.PageSize;
+
+    var query = $@"
+        SELECT
+            s.Id,
+            s.Id as OrderCode,
+            s.UserId as ClientId,
+            u.Name as ClientName,
+            srv.Title as ServiceName,
+            CAST(s.Amount as DECIMAL(10,2)) as Price,
+            s.CreatedAt as Date,
+            CASE
+                WHEN s.Status = 0 THEN 'Pending'
+                WHEN s.Status = 1 THEN 'Completed'
+                WHEN s.Status = 2 THEN 'Cancelled'
+                WHEN s.Status = 3 THEN 'Refunded'
+                ELSE 'Unknown'
+            END as Status
+        FROM Sells s
+        JOIN Users u ON s.UserId = u.Id
+        JOIN Services srv ON s.ServiceId = srv.Id
+        {whereClause}
+        ORDER BY s.CreatedAt DESC
+        LIMIT @PageSize OFFSET @Offset";
+
+    parameters.Add("PageSize", filter.PageSize);
+    parameters.Add("Offset", offset);
+
+    var ordersRaw = await connection.QueryAsync<dynamic>(query, parameters);
+
+    var ordersList = ordersRaw.Select(r => new AdminOrderItem(
+        Id: r.Id,
+        OrderCode: r.OrderCode,
+        ClientId: r.ClientId,
+        ClientName: r.ClientName,
+        ServiceName: r.ServiceName,
+        Price: Convert.ToDecimal(r.Price),
+        Date: DateTime.Parse(r.Date),
+        Status: r.Status
+    )).ToList();
+
+    return new AdminOrdersResponse(
+        Orders: ordersList,
+        Page: filter.Page,
+        PageSize: filter.PageSize,
+        TotalPages: totalPages,
+        TotalCount: totalResult.Count,
+        TotalAmount: totalResult.Sum
+    );
+  }
+
+  public async Task<OrderSummaryResponse> GetOrdersSummary(SummaryQueryFilter filter)
+  {
+    using var connection = new SqliteConnection(_connectionString);
+
+    // Determina o período base no filtro
+    var year = filter.Year ?? DateTime.Now.Year;
+    var month = filter.Month ?? DateTime.Now.Month;
+    var isPeriodMonth = filter.Period.ToLower() == "month";
+
+    var dateClause = isPeriodMonth
+        ? $"strftime('%Y', s.CreatedAt) = '{year}' AND strftime('%m', s.CreatedAt) = '{month:D2}'"
+        : $"strftime('%Y', s.CreatedAt) = '{year}'";
+
+    // Consulta estatísticas gerais
+    var statsQuery = $@"
+        SELECT COUNT(*), SUM(CAST(s.Amount as DECIMAL(10,2)))
+        FROM Sells s
+        WHERE {dateClause}";
+
+    var stats = await connection.QueryFirstOrDefaultAsync<(int Count, decimal Sum)>(statsQuery);
+
+    var topServicesQuery = $@"
+        SELECT
+            srv.Title as ServiceName,
+            COUNT(*) as Count,
+            SUM(CAST(s.Amount as DECIMAL(10,2))) as Revenue
+        FROM Sells s
+        JOIN Services srv ON s.ServiceId = srv.Id
+        WHERE {dateClause}
+        GROUP BY srv.Id
+        ORDER BY Revenue DESC
+        LIMIT 5";
+
+    var topServicesRaw = await connection.QueryAsync<dynamic>(topServicesQuery);
+
+    var topServicesList = topServicesRaw.Select(r => new TopServiceItem(
+        ServiceName: r.ServiceName,
+        Count: Convert.ToInt32(r.Count),
+        Revenue: Convert.ToDecimal(r.Revenue)
+    )).ToList();
+
+    return new OrderSummaryResponse(
+        Period: filter.Period,
+        Year: year,
+        Month: isPeriodMonth ? month : null,
+        OrderCount: stats.Count,
+        TotalRevenue: stats.Sum,
+        TopServices: topServicesList
+    );
   }
 }

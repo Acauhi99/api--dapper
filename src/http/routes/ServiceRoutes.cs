@@ -10,7 +10,7 @@ public static class ServiceRoutes
 {
   public static void MapServiceEndpoints(this WebApplication app)
   {
-    var group = app.MapGroup("/api/services");
+    var group = app.MapGroup("/api/services").WithTags("Services");
 
     // Public endpoints - para o frontend consumir
     group.MapGet("/", async (IServiceManagementService service) =>

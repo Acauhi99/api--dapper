@@ -1,6 +1,6 @@
 ### Variáveis
 @baseUrl = http://localhost:5090
-@token = {{login.response.body.token}}
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJTSjhKT1ZUb0NNaFkiLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUwMzY1NjMzLCJleHAiOjE3NTAzNjkyMzMsImlhdCI6MTc1MDM2NTYzMywiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.phriQYGcrFx_z7wrOV5J-ZRqgbuz6v4W11W-OQd0t7Q
 
 ### Login
 # @name login
@@ -19,7 +19,7 @@ Content-Type: application/json
 {
   "name": "João Silva",
   "email": "joao@example.com",
-  "password": "senha123"
+  "password": "user123"
 }
 
 ### Register - teste com email duplicado

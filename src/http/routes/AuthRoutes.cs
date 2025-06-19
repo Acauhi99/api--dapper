@@ -8,7 +8,7 @@ public static class AuthRoutes
 {
   public static void MapAuthEndpoints(this WebApplication app)
   {
-    var group = app.MapGroup("/api/auth");
+    var group = app.MapGroup("/api/auth").WithTags("Authentication");
 
     group.MapPost("/login", async (Login loginDto, IAuthService authService) =>
     {

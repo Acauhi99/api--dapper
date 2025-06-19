@@ -10,7 +10,7 @@ public static class AdminRoutes
 {
   public static void MapAdminEndpoints(this WebApplication app)
   {
-    var group = app.MapGroup("/api/admin");
+    var group = app.MapGroup("/api/admin").WithTags("Administration");
 
     group.MapPost("/setup", async (CreateAdminDto adminDto, IUserService userService, IConfiguration configuration) =>
     {

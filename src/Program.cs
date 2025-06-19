@@ -7,6 +7,7 @@ using api__dapper.infra.repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 using System.Text;
 using System.Threading.RateLimiting;
@@ -15,7 +16,41 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Services
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+  options.SwaggerDoc("v1", new OpenApiInfo
+  {
+    Title = "Services API",
+    Version = "v1",
+    Description = "API for managing services, users, and sales"
+  });
+
+  // Add JWT authentication to Swagger UI
+  options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+  {
+    Name = "Authorization",
+    Type = SecuritySchemeType.ApiKey,
+    Scheme = "Bearer",
+    BearerFormat = "JWT",
+    In = ParameterLocation.Header,
+    Description = "JWT Authorization header using the Bearer scheme."
+  });
+
+  options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -37,6 +72,7 @@ builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IServiceManagementService, ServiceManagementService>();
 builder.Services.AddScoped<ISellRepository, SellRepository>();
 builder.Services.AddScoped<ISellService, SellService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // Rate limiting
 builder.Services.AddRateLimiter(options =>
@@ -115,6 +151,7 @@ app.MapAuthEndpoints();
 app.MapAdminEndpoints();
 app.MapServiceEndpoints();
 app.MapSellEndpoints();
+app.MapDashboardEndpoints();
 
 
 // Application Start

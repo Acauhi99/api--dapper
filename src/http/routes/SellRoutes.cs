@@ -13,7 +13,7 @@ public static class SellRoutes
 {
   public static void MapSellEndpoints(this WebApplication app)
   {
-    var group = app.MapGroup("/api/sells");
+    var group = app.MapGroup("/api/sells").WithTags("Sales");
 
     // Admin: Ver todas as vendas
     group.MapGet("/", [Authorize(Policy = AuthorizationPolicies.AdminOnly)] async (ISellService service) =>
