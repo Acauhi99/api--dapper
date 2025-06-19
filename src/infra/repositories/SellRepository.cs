@@ -20,33 +20,45 @@ public class SellRepository(IConfiguration configuration) : ISellRepository
   private readonly string _connectionString = configuration.GetConnectionString("DefaultConnection")
         ?? throw new ArgumentNullException(nameof(configuration), "A connection string 'DefaultConnection' não foi encontrada.");
 
-  Task<string> ISellRepository.CreateSell(Sell sell)
+  public async Task<string> CreateSell(Sell sell)
   {
-    throw new NotImplementedException();
+    using var connection = new SqliteConnection(_connectionString);
+    var sql = @"INSERT INTO Sells (Id, UserId, ServiceId, PackageId, Amount, Status, CreatedAt, CompletedAt)
+                    VALUES (@Id, @UserId, @ServiceId, @PackageId, @Amount, @Status, @CreatedAt, @CompletedAt)";
+
+    await connection.ExecuteAsync(sql, sell);
+    return sell.Id;
   }
 
-  Task<bool> ISellRepository.DeleteSell(string id)
+  public async Task<bool> DeleteSell(string id)
   {
-    throw new NotImplementedException();
+    using var connection = new SqliteConnection(_connectionString);
+    var result = await connection.ExecuteAsync("DELETE FROM Sells WHERE Id = @Id", new { Id = id });
+    return result > 0;
   }
 
-  Task<IEnumerable<SellResponse>> ISellRepository.GetAllSells()
+  public async Task<IEnumerable<SellResponse>> GetAllSells()
   {
-    throw new NotImplementedException();
+    using var connection = new SqliteConnection(_connectionString);
+    return await connection.QueryAsync<SellResponse>("SELECT * FROM Sells");
   }
 
-  Task<SellResponse?> ISellRepository.GetSellById(string id)
+  public async Task<SellResponse?> GetSellById(string id)
   {
-    throw new NotImplementedException();
+    using var connection = new SqliteConnection(_connectionString);
+    return await connection.QueryFirstOrDefaultAsync<SellResponse>("SELECT * FROM Sells WHERE Id = @Id", new { Id = id });
   }
 
-  Task<IEnumerable<SellResponse>> ISellRepository.GetSellsByUserId(string userId)
+  public async Task<IEnumerable<SellResponse>> GetSellsByUserId(string userId)
   {
-    throw new NotImplementedException();
+    using var connection = new SqliteConnection(_connectionString);
+    return await connection.QueryAsync<SellResponse>("SELECT * FROM Sells WHERE UserId = @UserId", new { UserId = userId });
   }
 
-  Task<bool> ISellRepository.UpdateSellStatus(string id, SellStatus status)
+  public async Task<bool> UpdateSellStatus(string id, SellStatus status)
   {
-    throw new NotImplementedException();
+    using var connection = new SqliteConnection(_connectionString);
+    var result = await connection.ExecuteAsync("UPDATE Sells SET Status = @Status WHERE Id = @Id", new { Id = id, Status = status });
+    return result > 0;
   }
 }

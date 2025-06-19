@@ -20,33 +20,68 @@ public class SellService(ISellRepository repository) : ISellService
 {
   private readonly ISellRepository _repository = repository;
 
-  Task<SellResponse> ISellService.CreateSell(string userId, CreateSell sellDto)
+  public async Task<SellResponse> CreateSell(string userId, CreateSell sellDto)
   {
-    throw new NotImplementedException();
+    var sell = new Sell
+    {
+      Id = Nanoid.Generate(),
+      UserId = userId,
+      ServiceId = sellDto.ServiceId,
+      PackageId = sellDto.PackageId,
+      Amount = sellDto.Amount,
+      Status = SellStatus.Pending,
+      CreatedAt = DateTime.UtcNow
+    };
+
+    await _repository.CreateSell(sell);
+
+    return new SellResponse
+    (
+      Id: sell.Id,
+      UserId: sell.UserId,
+      ServiceId: sell.ServiceId,
+      PackageId: sell.PackageId,
+      Amount: sell.Amount,
+      Status: (int)sell.Status,
+      CreatedAt: sell.CreatedAt,
+      CompletedAt: sell.CompletedAt,
+      UserName: null,
+      ServiceTitle: null
+    );
   }
 
-  Task<bool> ISellService.DeleteSell(string id)
+  public async Task<bool> DeleteSell(string id)
   {
-    throw new NotImplementedException();
+    return await _repository.DeleteSell(id);
   }
 
-  Task<IEnumerable<SellResponse>> ISellService.GetAllSells()
+  public async Task<IEnumerable<SellResponse>> GetAllSells()
   {
-    throw new NotImplementedException();
+    return await _repository.GetAllSells();
   }
 
-  Task<SellResponse?> ISellService.GetSellById(string id)
+  public async Task<SellResponse?> GetSellById(string id)
   {
-    throw new NotImplementedException();
+    return await _repository.GetSellById(id);
   }
 
-  Task<IEnumerable<SellResponse>> ISellService.GetSellsByUserId(string userId)
+  public async Task<IEnumerable<SellResponse>> GetSellsByUserId(string userId)
   {
-    throw new NotImplementedException();
+    return await _repository.GetSellsByUserId(userId);
   }
 
-  Task<SellResponse?> ISellService.UpdateSellStatus(string id, UpdateSellStatus statusDto)
+  public async Task<SellResponse?> UpdateSellStatus(string id, UpdateSellStatus statusDto)
   {
-    throw new NotImplementedException();
+    var sellResponse  = await _repository.GetSellById(id);
+    if (sellResponse  == null)
+    {
+      return null;
+    }
+
+    await _repository.UpdateSellStatus(id, (SellStatus)statusDto.Status);
+
+    sellResponse = await _repository.GetSellById(id);
+
+    return sellResponse ;
   }
 }
