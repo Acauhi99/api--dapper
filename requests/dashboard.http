@@ -1,0 +1,52 @@
+### Variáveis
+@baseUrl = http://localhost:5090
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJTSjhKT1ZUb0NNaFkiLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUwMzY1NjMzLCJleHAiOjE3NTAzNjkyMzMsImlhdCI6MTc1MDM2NTYzMywiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.phriQYGcrFx_z7wrOV5J-ZRqgbuz6v4W11W-OQd0t7Q
+@userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJLcXR6Z0Y2U3JlaDQiLCJ1bmlxdWVfbmFtZSI6Ikpvw6NvIFNpbHZhIiwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwicm9sZSI6IlVzZXIiLCJuYmYiOjE3NTAzNjUyNTQsImV4cCI6MTc1MDM2ODg1NCwiaWF0IjoxNzUwMzY1MjU0LCJpc3MiOiJhcGktLWRhcHBlciIsImF1ZCI6ImFwaS0tZGFwcGVyLWNsaWVudHMifQ.Y2Go8nOwD7OD1GT3v0JN8kY9WgMimnG90RW2YaISOiU
+
+
+### Get Client Order History (Usuário autenticado)
+GET {{baseUrl}}/api/orders/client
+Authorization: Bearer {{userToken}}
+
+### Get Client Order History com filtros
+GET {{baseUrl}}/api/orders/client?startDate=2025-01-01&endDate=2025-06-20&orderCode=123&serviceName=Web
+Authorization: Bearer {{userToken}}
+
+### Get Client Order History - Acesso sem autenticação (deve falhar)
+GET {{baseUrl}}/api/orders/client
+
+
+### Get Admin Orders List (Admin apenas)
+GET {{baseUrl}}/api/orders
+Authorization: Bearer {{adminToken}}
+
+### Get Admin Orders List com filtros e paginação
+GET {{baseUrl}}/api/orders?startDate=2025-01-01&endDate=2025-06-20&orderCode=123&clientName=João&serviceName=Web&page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Get Admin Orders List - Acesso sem autenticação (deve falhar)
+GET {{baseUrl}}/api/orders
+
+### Get Admin Orders List - Acesso com token de usuário comum (deve falhar)
+GET {{baseUrl}}/api/orders
+Authorization: Bearer {{userToken}}
+
+
+### Get Order Summary - Mês atual (Admin apenas)
+GET {{baseUrl}}/api/orders/summary
+Authorization: Bearer {{adminToken}}
+
+### Get Order Summary - Mês específico
+GET {{baseUrl}}/api/orders/summary?period=month&month=6&year=2025
+Authorization: Bearer {{adminToken}}
+
+### Get Order Summary - Ano inteiro
+GET {{baseUrl}}/api/orders/summary?period=year&year=2025
+Authorization: Bearer {{adminToken}}
+
+### Get Order Summary - Acesso sem autenticação (deve falhar)
+GET {{baseUrl}}/api/orders/summary
+
+### Get Order Summary - Acesso com token de usuário comum (deve falhar)
+GET {{baseUrl}}/api/orders/summary
+Authorization: Bearer {{userToken}}
