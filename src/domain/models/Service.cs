@@ -5,7 +5,7 @@ namespace api__dapper.domain.models
   public class Service
   {
     public string Id { get; set; } = string.Empty;
-    public string Key { get; set; } = string.Empty; // gold, dungeons, raids, pvp, itens
+    public string Key { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string FeaturesTitle { get; set; } = string.Empty;

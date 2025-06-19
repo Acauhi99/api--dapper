@@ -1,8 +1,8 @@
 ### Variáveis
 @baseUrl = http://localhost:5090
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiItYnpfTi1jS05LeXIiLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzQ4NjU2MTg2LCJleHAiOjE3NDg2NTk3ODYsImlhdCI6MTc0ODY1NjE4NiwiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.caGZl3UWrntFrkT2wkrFsl_cuxHwx8PjJ-nCpGzmFhI
-@serviceId = service-id-here
-@serviceKey = service-key-here
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJQajJGVnZlX0ZkLTIiLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUwMzU2NTI4LCJleHAiOjE3NTAzNjAxMjgsImlhdCI6MTc1MDM1NjUyOCwiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0.F0PNb-GGhLahnS2TWeImUMXpQxyqRWncuHIKwEwzzwQ
+@serviceId = 3qtXZhB9ubCv
+@serviceKey = web-dev
 
 ### Get All Services (Public)
 GET {{baseUrl}}/api/services
@@ -10,28 +10,101 @@ GET {{baseUrl}}/api/services
 ### Get Service by Key (Public)
 GET {{baseUrl}}/api/services/key/{{serviceKey}}
 
-### Create Service (Admin only)
+### Create Service - Web Development (Admin only)
 POST {{baseUrl}}/api/services
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "Web Development",
-  "description": "Complete web development service",
-  "price": 999.99,
-  "key": "web-dev"
+  "key": "web-dev",
+  "title": "Desenvolvimento Web",
+  "description": "Serviço completo de desenvolvimento web com tecnologias modernas",
+  "featuresTitle": "O que você vai receber:",
+  "detailsTitle": "Detalhes do serviço:",
+  "packagesTitle": "Escolha seu pacote:",
+  "features": [
+    "Design responsivo e moderno",
+    "Otimização para SEO",
+    "Integração com APIs",
+    "Painel administrativo",
+    "Suporte técnico por 6 meses"
+  ],
+  "details": [
+    "Desenvolvimento utilizando tecnologias modernas como React, Node.js",
+    "Hospedagem e domínio inclusos no primeiro ano",
+    "Certificado SSL gratuito",
+    "Backup automático diário",
+    "Relatórios de performance mensal"
+  ],
+  "packages": [
+    {
+      "name": "Básico",
+      "price": "R$ 2.500",
+      "isPopular": false,
+      "order": 0
+    },
+    {
+      "name": "Profissional",
+      "price": "R$ 4.500",
+      "isPopular": true,
+      "order": 1
+    },
+    {
+      "name": "Enterprise",
+      "price": "R$ 8.500",
+      "isPopular": false,
+      "order": 2
+    }
+  ]
 }
 
-### Create Service - outro exemplo
+### Create Service - Mobile App (Admin only)
 POST {{baseUrl}}/api/services
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "Mobile App Development",
-  "description": "Native and cross-platform mobile app development",
-  "price": 1499.99,
-  "key": "mobile-dev"
+  "key": "mobile-dev",
+  "title": "Desenvolvimento de App Mobile",
+  "description": "Desenvolvimento de aplicativos nativos e híbridos para iOS e Android",
+  "featuresTitle": "Recursos inclusos:",
+  "detailsTitle": "Especificações técnicas:",
+  "packagesTitle": "Pacotes disponíveis:",
+  "features": [
+    "App nativo para iOS e Android",
+    "Design UX/UI personalizado",
+    "Integração com APIs e serviços",
+    "Push notifications",
+    "Analytics integrado",
+    "Publicação nas lojas"
+  ],
+  "details": [
+    "Desenvolvimento em React Native ou Flutter",
+    "Testes automatizados inclusos",
+    "Documentação técnica completa",
+    "Suporte para versões futuras do SO",
+    "Integração com serviços de pagamento"
+  ],
+  "packages": [
+    {
+      "name": "MVP",
+      "price": "R$ 8.000",
+      "isPopular": false,
+      "order": 0
+    },
+    {
+      "name": "Completo",
+      "price": "R$ 15.000",
+      "isPopular": true,
+      "order": 1
+    },
+    {
+      "name": "Enterprise",
+      "price": "R$ 25.000",
+      "isPopular": false,
+      "order": 2
+    }
+  ]
 }
 
 ### Get Service by ID (Admin only)
@@ -44,10 +117,39 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "Web Development Premium",
-  "description": "Complete web development service with premium features",
-  "price": 1299.99,
-  "key": "web-dev-premium"
+  "title": "Desenvolvimento Web Premium",
+  "description": "Serviço premium de desenvolvimento web com recursos avançados",
+  "featuresTitle": "Recursos premium:",
+  "detailsTitle": "Detalhes técnicos:",
+  "packagesTitle": "Pacotes premium:",
+  "features": [
+    "Design responsivo e moderno",
+    "Otimização avançada para SEO",
+    "Integração com múltiplas APIs",
+    "Dashboard administrativo avançado",
+    "Suporte técnico 24/7 por 12 meses"
+  ],
+  "details": [
+    "Arquitetura escalável e performática",
+    "Implementação de PWA",
+    "Análise de performance detalhada",
+    "Monitoramento em tempo real",
+    "Integração com CDN global"
+  ],
+  "packages": [
+    {
+      "name": "Premium",
+      "price": "R$ 6.500",
+      "isPopular": true,
+      "order": 0
+    },
+    {
+      "name": "Enterprise+",
+      "price": "R$ 12.500",
+      "isPopular": false,
+      "order": 1
+    }
+  ]
 }
 
 ### Delete Service (Admin only)

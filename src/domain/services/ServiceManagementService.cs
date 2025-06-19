@@ -1,7 +1,6 @@
 using api__dapper.domain.models;
 using api__dapper.dtos;
 using api__dapper.infra.repositories;
-
 using NanoidDotNet;
 
 namespace api__dapper.domain.services;
@@ -19,33 +18,143 @@ public interface IServiceManagementService
 public class ServiceManagementService(IServiceRepository repository) : IServiceManagementService
 {
   private readonly IServiceRepository _repository = repository;
-  Task<ServiceDetailsResponse> IServiceManagementService.CreateService(CreateService serviceDto)
+
+  public async Task<IEnumerable<ServiceDetailsResponse>> GetAllServices()
   {
-    throw new NotImplementedException();
+    var services = await _repository.GetAllServices();
+    return services.Select(MapToResponse);
   }
 
-  Task<bool> IServiceManagementService.DeleteService(string id)
+  public async Task<ServiceDetailsResponse?> GetServiceById(string id)
   {
-    throw new NotImplementedException();
+    var service = await _repository.GetServiceById(id);
+    return service == null ? null : MapToResponse(service);
   }
 
-  Task<IEnumerable<ServiceDetailsResponse>> IServiceManagementService.GetAllServices()
+  public async Task<ServiceDetailsResponse?> GetServiceByKey(string key)
   {
-    throw new NotImplementedException();
+    var service = await _repository.GetServiceByKey(key);
+    return service == null ? null : MapToResponse(service);
   }
 
-  Task<ServiceDetailsResponse?> IServiceManagementService.GetServiceById(string id)
+  public async Task<ServiceDetailsResponse> CreateService(CreateService serviceDto)
   {
-    throw new NotImplementedException();
+    var service = new Service
+    {
+      Id = Nanoid.Generate(size: 12),
+      Key = serviceDto.Key,
+      Title = serviceDto.Title,
+      Description = serviceDto.Description,
+      FeaturesTitle = serviceDto.FeaturesTitle,
+      DetailsTitle = serviceDto.DetailsTitle,
+      PackagesTitle = serviceDto.PackagesTitle,
+      CreatedAt = DateTime.UtcNow,
+      UpdatedAt = DateTime.UtcNow,
+      Features = serviceDto.Features.Select((text, index) => new ServiceFeature
+      {
+        Id = Nanoid.Generate(size: 12),
+        ServiceId = "",
+        Text = text,
+        Order = index
+      }).ToList(),
+      Details = serviceDto.Details.Select((text, index) => new ServiceDetail
+      {
+        Id = Nanoid.Generate(size: 12),
+        ServiceId = "",
+        Text = text,
+        Order = index
+      }).ToList(),
+      Packages = serviceDto.Packages.Select((pkg, index) => new Package
+      {
+        Id = Nanoid.Generate(size: 12),
+        ServiceId = "",
+        Name = pkg.Name,
+        Price = pkg.Price,
+        IsPopular = pkg.IsPopular,
+        Order = pkg.Order,
+        CreatedAt = DateTime.UtcNow
+      }).ToList()
+    };
+
+    foreach (var feature in service.Features)
+      feature.ServiceId = service.Id;
+
+    foreach (var detail in service.Details)
+      detail.ServiceId = service.Id;
+
+    foreach (var package in service.Packages)
+      package.ServiceId = service.Id;
+
+    await _repository.CreateService(service);
+    return MapToResponse(service);
   }
 
-  Task<ServiceDetailsResponse?> IServiceManagementService.GetServiceByKey(string key)
+  public async Task<ServiceDetailsResponse?> UpdateService(string id, UpdateService serviceDto)
   {
-    throw new NotImplementedException();
+    var existingService = await _repository.GetServiceById(id);
+    if (existingService == null) return null;
+
+    existingService.Title = serviceDto.Title;
+    existingService.Description = serviceDto.Description;
+    existingService.FeaturesTitle = serviceDto.FeaturesTitle;
+    existingService.DetailsTitle = serviceDto.DetailsTitle;
+    existingService.PackagesTitle = serviceDto.PackagesTitle;
+    existingService.UpdatedAt = DateTime.UtcNow;
+
+    existingService.Features = serviceDto.Features.Select((text, index) => new ServiceFeature
+    {
+      Id = Nanoid.Generate(size: 12),
+      ServiceId = existingService.Id,
+      Text = text,
+      Order = index
+    }).ToList();
+
+    existingService.Details = serviceDto.Details.Select((text, index) => new ServiceDetail
+    {
+      Id = Nanoid.Generate(size: 12),
+      ServiceId = existingService.Id,
+      Text = text,
+      Order = index
+    }).ToList();
+
+    existingService.Packages = serviceDto.Packages.Select((pkg, index) => new Package
+    {
+      Id = Nanoid.Generate(size: 12),
+      ServiceId = existingService.Id,
+      Name = pkg.Name,
+      Price = pkg.Price,
+      IsPopular = pkg.IsPopular,
+      Order = pkg.Order,
+      CreatedAt = DateTime.UtcNow
+    }).ToList();
+
+    var success = await _repository.UpdateService(existingService);
+    return success ? MapToResponse(existingService) : null;
   }
 
-  Task<ServiceDetailsResponse?> IServiceManagementService.UpdateService(string id, UpdateService serviceDto)
+  public async Task<bool> DeleteService(string id)
   {
-    throw new NotImplementedException();
+    return await _repository.DeleteService(id);
+  }
+
+  private static ServiceDetailsResponse MapToResponse(Service service)
+  {
+    return new ServiceDetailsResponse(
+      service.Id,
+      service.Key,
+      service.Title,
+      service.Description,
+      service.FeaturesTitle,
+      service.Features.OrderBy(f => f.Order).Select(f => f.Text).ToList(),
+      service.DetailsTitle,
+      service.Details.OrderBy(d => d.Order).Select(d => d.Text).ToList(),
+      service.PackagesTitle,
+      service.Packages.OrderBy(p => p.Order).Select(p => new PackageResponse(
+        p.Id,
+        p.Name,
+        p.Price,
+        p.IsPopular
+      )).ToList()
+    );
   }
 }
