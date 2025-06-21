@@ -37,8 +37,41 @@ public static class SellRoutes
       return Results.Ok(sells);
     });
 
-    // User: Criar uma nova compra
-    group.MapPost("/", [Authorize(Policy = AuthorizationPolicies.UserOrAdmin)] async (CreateSell sellDto, ISellService service, ClaimsPrincipal user) =>
+    // User: Criar uma nova compra (Nova versão conforme contrato)
+    group.MapPost("/", [Authorize(Policy = AuthorizationPolicies.UserOrAdmin)] async (CreateSellOrderRequest request, ISellService service, ClaimsPrincipal user) =>
+    {
+      var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+      if (string.IsNullOrEmpty(userId))
+        return Results.Unauthorized();
+
+      try
+      {
+        // Validate the request
+        if (request.Items == null || !request.Items.Any())
+          return Results.BadRequest(new { message = "At least one item is required" });
+
+        if (request.Total <= 0)
+          return Results.BadRequest(new { message = "Total must be greater than zero" });
+
+        if (string.IsNullOrEmpty(request.PaymentMethod))
+          return Results.BadRequest(new { message = "Payment method is required" });
+
+        // Process the request
+        var result = await service.CreateSellOrder(userId, request);
+
+        // Return success response
+        return Results.Ok(result);
+      }
+      catch (Exception ex)
+      {
+        // Log the exception
+        Console.WriteLine($"Error creating sell: {ex.Message}");
+        return Results.StatusCode(StatusCodes.Status500InternalServerError);
+      }
+    });
+
+    // Old version (keep for backward compatibility if needed)
+    group.MapPost("/legacy", [Authorize(Policy = AuthorizationPolicies.UserOrAdmin)] async (CreateSell sellDto, ISellService service, ClaimsPrincipal user) =>
     {
       var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
       if (string.IsNullOrEmpty(userId))

@@ -10,6 +10,7 @@ namespace api__dapper.domain.models
     public SellStatus Status { get; set; } = SellStatus.Pending;
     public DateTime CreatedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
+    public string PaymentMethod { get; set; } = "PIX";
 
     // Navigation properties (opcional para queries)
     public User? User { get; set; }

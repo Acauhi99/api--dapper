@@ -68,11 +68,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IServiceManagementService, ServiceManagementService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<ISellRepository, SellRepository>();
 builder.Services.AddScoped<ISellService, SellService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // Rate limiting
 builder.Services.AddRateLimiter(options =>

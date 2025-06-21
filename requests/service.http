@@ -2,7 +2,7 @@
 @baseUrl = http://localhost:5090
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJTSjhKT1ZUb0NNaFkiLCJ1bmlxdWVfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUwMzY0OTIwLCJleHAiOjE3NTAzNjg1MjAsImlhdCI6MTc1MDM2NDkyMCwiaXNzIjoiYXBpLS1kYXBwZXIiLCJhdWQiOiJhcGktLWRhcHBlci1jbGllbnRzIn0._MjLh9FVDofJOLJ1ZbJzaozWM5GIN-kVydgA9fgh0F0
 @serviceId = 3qtXZhB9ubCv
-@serviceKey = web-dev
+@serviceKey = gold
 
 ### Get All Services (Public)
 GET {{baseUrl}}/api/services

@@ -15,4 +15,31 @@ namespace api__dapper.dtos
     string? UserName,
     string? ServiceTitle
   );
+
+  // New DTOs for the updated contract
+  public record SellItemDto(
+    string Title,
+    string Description,
+    decimal UnitPrice,
+    int Quantity
+  );
+
+  public record CreateSellOrderRequest(
+    List<SellItemDto> Items,
+    decimal Subtotal,
+    decimal ServiceFee,
+    decimal Total,
+    string PaymentMethod
+  );
+
+  public record SellCreateResponse(
+    string Id,
+    string ServiceId,
+    string PackageId,
+    decimal Amount,
+    int Status,
+    DateTime CreatedAt,
+    string ServiceTitle,
+    string PaymentMethod
+  );
 }

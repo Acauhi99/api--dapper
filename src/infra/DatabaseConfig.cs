@@ -102,6 +102,7 @@ public static class DatabaseConfig
                 Status INTEGER NOT NULL DEFAULT 0,
                 CreatedAt TEXT NOT NULL,
                 CompletedAt TEXT NULL,
+                PaymentMethod TEXT NOT NULL DEFAULT 'PIX',
                 FOREIGN KEY (UserId) REFERENCES Users (Id) ON DELETE CASCADE,
                 FOREIGN KEY (ServiceId) REFERENCES Services (Id) ON DELETE CASCADE,
                 FOREIGN KEY (PackageId) REFERENCES Packages (Id) ON DELETE CASCADE

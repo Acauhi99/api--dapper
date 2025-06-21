@@ -8,8 +8,8 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@example.com",
-  "password": "admin123"
+  "email": "joao@example.com",
+  "password": "user123"
 }
 
 ### Register new user

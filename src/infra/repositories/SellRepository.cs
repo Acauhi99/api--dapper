@@ -26,8 +26,8 @@ public class SellRepository(IConfiguration configuration) : ISellRepository
   public async Task<string> CreateSell(Sell sell)
   {
     using var connection = new SqliteConnection(_connectionString);
-    var sql = @"INSERT INTO Sells (Id, UserId, ServiceId, PackageId, Amount, Status, CreatedAt, CompletedAt)
-                    VALUES (@Id, @UserId, @ServiceId, @PackageId, @Amount, @Status, @CreatedAt, @CompletedAt)";
+    var sql = @"INSERT INTO Sells (Id, UserId, ServiceId, PackageId, Amount, Status, CreatedAt, CompletedAt, PaymentMethod)
+                VALUES (@Id, @UserId, @ServiceId, @PackageId, @Amount, @Status, @CreatedAt, @CompletedAt, @PaymentMethod)";
 
     await connection.ExecuteAsync(sql, sell);
     return sell.Id;
